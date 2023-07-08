@@ -66,3 +66,9 @@ Antes de rodar o projeto crie uma banco de dados MySQL assim como o de `applicat
 ```Ruby
  http://localhost:8080/manegement/{id}
 ```
+
+
+`GET` Documentação mais detalhada
+```Ruby
+ http://localhost:8080/swagger-ui/index.html
+```
