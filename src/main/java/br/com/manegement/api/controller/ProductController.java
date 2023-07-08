@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +26,16 @@ public class ProductController {
 
         List<ProductDTO> products = repository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
         return  products;
-
     }
     @GetMapping("/{id}")
     public ProductDTO getById(@PathVariable long id) {
 
-        Product product = repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
-        return mapper.toDTO(product);
+        if (!repository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
 
+        Product product = repository.findById(id).get();
+        return mapper.toDTO(product);
     }
     @PostMapping @ResponseStatus(HttpStatus.CREATED)
     public ProductDTO post(@RequestBody @Valid ProductDTO dto) {
@@ -46,13 +47,21 @@ public class ProductController {
     @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
 
+        if (!repository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
+
         repository.deleteById(id);
     }
 
     @PutMapping("/{id}")
     public ProductDTO put(@PathVariable long id, @RequestBody ProductDTO dto) {
 
-        Product product = repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+        if (!repository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
+
+        Product product = repository.findById(id).get();
 
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
